@@ -1,0 +1,39 @@
+apiVersion: extensions/v1beta1
+kind: ReplicaSet
+metadata:
+  name: kapacitor
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kapacitor
+    spec:
+      containers:
+      - name: kapacitor
+        image: kapacitor:1.1.0-rc2
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9092
+        volumeMounts:
+        - mountPath: /kapacitor
+          name: kapacitor-volume
+        env:
+          - name: "KAPACITOR_INFLUXDB_0_ENABLED"
+            value: "false"
+          - name: "KAPACITOR_LOGGING_LEVEL"
+            value: "DEBUG"
+          - name: "KAPACITOR_KUBERNETES_ENABLED"
+            value: "true"
+          - name: "KAPACITOR_KUBERNETES_IN_CLUSTER"
+            value: "true"
+          - name: "KAPACITOR_DATA_DIR"
+            value: "/kapacitor"
+          - name: "KAPACITOR_REPLAY_DIR"
+            value: "/kapacitor/replay"
+          - name: "KAPACITOR_STORAGE_BOLTDB"
+            value: "/kapacitor/kapacitor.db"
+      volumes:
+      - name: kapacitor-volume
+        hostPath:
+          path: /data/kapacitor

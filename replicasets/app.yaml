@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: ReplicaSet
+metadata:
+  name: app
+spec:
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+      - name: app
+        image: kapacitor-autoscale/app:0.0.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        env:
+          - name: "APP_REPLICASET"
+            value: "app"
+          - name: "APP_INFLUXDB_URL"
+            value: "http://kapacitor.default:9092/write?db=autoscale&rp=autogen&precision=s"
