@@ -40,11 +40,15 @@ It does only two things:
 To build the application first you need to be able build and publish a docker container such that your k8s cluster can pull it.
 If you are using minikube this is simple:
 
+    $ # create a new shell env for talking to docker inside minikube
+    $ bash
     $ # source the minikube docker environment
     $ eval $(minikube docker-env)
     $ # build the app
     $ cd app
     $ ./build-container
+    $ # leave this specific shell env
+    $ exit
 
 >NOTE: If you are not using minikube then you must also `docker push` the image to a docker repository your k8s cluster can use.
 
@@ -95,7 +99,7 @@ The client can be downloader from [here](https://www.influxdata.com/downloads/#k
 
 If you do not want to use the client locally then start a docker container.
 
-    $ docker run -it -v $(pwd):/k8s-kapacitor-autoscale:ro -e KAPACITOR_URL="$KAPACITOR_URL" kapacitor bash
+    $ docker run -it --rm -v $(pwd):/k8s-kapacitor-autoscale:ro -e KAPACITOR_URL="$KAPACITOR_URL" kapacitor:1.1.0-rc2 bash
 
 Once inside the container change directory to the repository:
 
@@ -110,11 +114,14 @@ First check that we can talk to Kapacitor:
 
 You should see output like the following:
 
-TODO
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    ClusterID:                    7b4d5ca3-8074-403f-99b9-e1743c3dbbff
+    ServerID:                     94d0f5ea-5a57-4573-a279-e69a81fc5b5c
+    Host:                         kapacitor-3uuir
+    Tasks:                        0
+    Enabled Tasks:                0
+    Subscriptions:                0
+    Version:                      1.1.0
+
 
 ### Using Kapacitor to autoscale our application
 

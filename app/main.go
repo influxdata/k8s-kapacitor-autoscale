@@ -29,8 +29,9 @@ func main() {
 func handler(w http.ResponseWriter, r *http.Request) {
 	for {
 		r := atomic.LoadInt64(&requests)
-		if atomic.CompareAndSwapInt64(&requests, r, r+1) {
-			fmt.Fprintf(w, "Current request count %d\n", r)
+		n := r + 1
+		if atomic.CompareAndSwapInt64(&requests, r, n) {
+			fmt.Fprintf(w, "Current request count %d\n", n)
 			break
 		}
 	}
