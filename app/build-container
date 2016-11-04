@@ -1,4 +1,0 @@
-#!/bin/bash
-./build
-docker build -t kapacitor-autoscale/app:0.0.1 .
-rm app

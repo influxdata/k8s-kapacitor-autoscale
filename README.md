@@ -34,24 +34,6 @@ It does only two things:
 1. On an HTTP GET request to its listening port it will return the current total number of requests the app has served.
 2. Once per second it will send a point to Kapacitor using the [line protocol](https://docs.influxdata.com/influxdb/v1.1/write_protocols/line_protocol_tutorial/) containing the number of requests the app has served, tagged by host and k8s replicaset.
 
-
-### Build the Application
-
-To build the application first you need to be able build and publish a docker container such that your k8s cluster can pull it.
-If you are using minikube this is simple:
-
-    $ # create a new shell env for talking to docker inside minikube
-    $ bash
-    $ # source the minikube docker environment
-    $ eval $(minikube docker-env)
-    $ # build the app
-    $ cd app
-    $ ./build-container
-    $ # leave this specific shell env
-    $ exit
-
->NOTE: If you are not using minikube then you must also `docker push` the image to a docker repository your k8s cluster can use.
-
 ### Start the Application
 
 This repo provides a basic k8s ReplicaSet definition for the app.
