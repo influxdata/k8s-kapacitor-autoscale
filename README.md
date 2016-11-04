@@ -76,8 +76,8 @@ Again using minikube we can get a URL for connecting to Kapacitor
     $ export KAPACITOR_URL=$(minikube service kapacitor --url)
     $ echo $KAPACITOR_URL
 
-At this point you either need to have the `kapacitor` client installed locally or docker to run the client.
-The client can be downloader from [here](https://www.influxdata.com/downloads/#kapacitor).
+At this point you either need to have the `kapacitor` client installed locally or via docker to run the client.
+The client can be downloaded from [here](https://www.influxdata.com/downloads/#kapacitor).
 
 If you do not want to use the client locally then start a docker container.
 
@@ -88,7 +88,7 @@ Once inside the container change directory to the repository:
     $ cd /k8s-kapacitor-autoscale
 
 
-Now whether you are inside on container or on your local box the commands should be the same.
+Now whether you are inside the container or on your local box the commands should be the same.
 
 First check that we can talk to Kapacitor:
 
@@ -107,8 +107,8 @@ You should see output like the following:
 
 ### Using Kapacitor to autoscale our application
 
-Kapacitor uses `tasks` to do work, the next steps involve defining a new task that will autoscale our app and enabling that task.
-A task is defined via a [TICKscript](https://docs.influxdata.com/kapacitor/v1.1/tick/), this repository has the TICKscript we need, `autoscale.tick`.
+Kapacitor uses `tasks` to do work, the next steps involve defining and enabling a new task that will autoscale our app.
+A task is defined via a [TICKscript](https://docs.influxdata.com/kapacitor/v1.1/tick/). This repository has the TICKscript we need: [`autoscale.tick`](https://github.com/influxdata/k8s-kapacitor-autoscale/blob/master/autoscale.tick).
 
 Define and enable the autoscale task in Kapacitor:
 
@@ -125,15 +125,14 @@ There will be lots of output about the content and status of the task but the se
 
 Since the task has just started the k8s_autoscale6 node has not processed any points yet but it will after a minute.
 
-At this point take a minute to read the task and get a feel for what it is doing.
+At this point take a minute to [read the task](https://github.com/influxdata/k8s-kapacitor-autoscale/blob/master/autoscale.tick) and get a feel for what it is doing.
 The high level steps are:
 
 * Select the `requests` data that each application host is sending.
-* Compute the requests per second for host
-* For each replicaset, (in our case it's just the one `app` replicaset) compute the total request per second across all hosts.
-* Compute a moving average of the total request per second over the last 60 points or 1m.
-* Compute the desired number of hosts for the replicaset based on the target value.
-    At this step Kapacitor will call out to the Kubernetes API and change the desired replicas to match the computed result.
+* Compute the requests per second per host
+* For each replicaset (in our case it's just the one `app` replicaset), compute the total requests per second across all hosts.
+* Compute a moving average of the total requests per second over the last 60 points (`1m`).
+* Compute the desired number of hosts for the replicaset based on the target value. At this step Kapacitor will call out to the Kubernetes API and change the desired replicas to match the computed result.
 
 There are some more details about cooldowns and other things, feel free to ignore those for now.
 
@@ -148,8 +147,8 @@ Once the request count increases on the app pod Kapacitor will instruct k8s to c
 At that point you should see multiple app pods while still only seeing one Kapacitor pod.
 
 There are several ways to generate HTTP requests, use a tool you are comfortable with.
-If you do not already have a favorite HTTP load generation tool may we recommend [hey](https://github.com/rakyll/hey).
-We also provide a simple script `ramp.sh` that uses `hey` to slowly ramp traffic up and then back down.
+If you do not already have a favorite HTTP load generation tool we recommend [hey](https://github.com/rakyll/hey).
+We also provide a simple script [`ramp.sh`](https://github.com/influxdata/k8s-kapacitor-autoscale/blob/master/ramp.sh) that uses `hey` to slowly ramp traffic up and then back down.
 
 Install `hey` before running `ramp.sh`:
 
@@ -160,7 +159,7 @@ Install `hey` before running `ramp.sh`:
 
 While the traffic is ramping up watch the current list of pods to see that more pods are added as traffic increases.
 The default target is 100 requests per second per host.
-The `ramp.sh` script will print out the current QPS it is generating, divide that number by 100 and round up.
+The `ramp.sh` script will print out the current QPS it is generating. Divide that number by 100 and round up.
 That should be the number of app pods running.
 
     $ kubectl get pods -w
@@ -170,22 +169,20 @@ That should be the number of app pods running.
 You may have noticed that new nodes are not immediately added once a new threshold is crossed.
 This is because we have instructed Kapacitor to only increase the number of replicas at most once per minute.
 This is so that we give the new nodes that have been added a chance to warm up and for the cluster as a whole to stabilize.
-Typically you would set this value to however long is takes a new pods to get up and running.
+Typically you would set this value to however long it takes new pods to get up and running.
 In our simple example the app can start up much faster because it does so little.
-Feel free to play with the cooldown settings to see how it reacts.
+Feel free to play with the [cooldown](https://github.com/influxdata/k8s-kapacitor-autoscale/blob/master/autoscale.tick#L5) [settings](https://github.com/influxdata/k8s-kapacitor-autoscale/blob/master/autoscale.tick#L8) to see how it reacts.
 
 ## What next?
 
 At this point you should be familiar with the basics of autoscaling a simple app using Kapacitor.
-For more information and details on this process have a look at the [docs](https://docs.influxdata.com/kapacitor/v1.1/nodes/k8s_autoscale_node/)
+For more information and details on this process have a look at the [docs](https://docs.influxdata.com/kapacitor/v1.1/nodes/k8s_autoscale_node/).
 
 ## Why not just use an HPA?
 
-Kubernetes already comes with a [horizontal pod autoscaler](http://kubernetes.io/docs/user-guide/horizontal-pod-autoscaling/) (HPA), why use Kapacitor?
-First, off the HPA was the basis for how the autoscaler was implemented in Kapacitor.
-Currently the HPA can only scale based off memory/cpu usage metrics or using custom metrics which must be defined via cAdvisor specific definitions.
+Kubernetes already comes with a [horizontal pod autoscaler](http://kubernetes.io/docs/user-guide/horizontal-pod-autoscaling/) (HPA), so why use Kapacitor, which is strongly based on the HPA?
+Currently, the HPA can only scale based on memory or cpu usage metrics, or by using custom metrics which must be defined via cAdvisor-specific definitions.
 
-By using Kapacitor you have access to a much richer set of data.
-You can scale based off a combination of different metrics, aggregations of over multiple metrics, use historical traffic data or anything else you can dream up using TICKscripts.
-This allows you to clearly define exactly what formula is being used for autoscaling, with visibility into each step of that processes.
-
+By using Kapacitor you have access to a much richer set of data from which to trigger autoscaling.
+You can scale based on a combination of metrics, aggregations over multiple metrics, historical traffic data, or anything else you can code in a TICKscript.
+This allows you to clearly define exactly what formula is being used for autoscaling, with visibility into each step of that process.
