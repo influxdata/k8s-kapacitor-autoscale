@@ -18,4 +18,4 @@ spec:
           - name: "APP_REPLICASET"
             value: "app"
           - name: "APP_INFLUXDB_URL"
-            value: "http://kapacitor.default:9092/write?db=autoscale&rp=autogen&precision=s"
+            value: "http://kapacitor:9092/write?db=autoscale&rp=autogen&precision=s"
