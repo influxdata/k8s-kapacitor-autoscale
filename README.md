@@ -151,6 +151,9 @@ There are several ways to generate HTTP requests, use a tool you are comfortable
 If you do not already have a favorite HTTP load generation tool may we recommend [hey](https://github.com/rakyll/hey).
 We also provide a simple script `ramp.sh` that uses `hey` to slowly ramp traffic up and then back down.
 
+Install `hey` before running `ramp.sh`:
+
+    $ go get -u github.com/rakyll/hey
     $ ./ramp.sh $APP_URL
 
 ### Watch autoscaling in progress
@@ -160,7 +163,7 @@ The default target is 100 requests per second per host.
 The `ramp.sh` script will print out the current QPS it is generating, divide that number by 100 and round up.
 That should be the number of app pods running.
 
-    $ watch kubectl get pods
+    $ kubectl get pods -w
 
 ### Cooldown
 
