@@ -1,4 +1,4 @@
-# Kapacitor + Kubernetes Autscaling
+# Kapacitor + Kubernetes Autoscaling
 
 This repository provides a simple example of how you can use [Kapacitor](https://www.influxdata.com/time-series-platform/kapacitor/) to autoscale resources in [Kuberentes](http://kubernetes.io/).
 If you are already familiar with Kapacitor and Kuberentes you may just want to jump over to the [K8sAutoscale](https://docs.influxdata.com/kapacitor/v1.1/nodes/k8s_autoscale_node/) docs.
