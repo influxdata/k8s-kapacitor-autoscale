@@ -1,7 +1,7 @@
 # Kapacitor + Kubernetes Autscaling
 
-This repository provides a simple example of how you can use [Kapacitor](https://www.influxdata.com/time-series-platform/kapacitor/) to autoscale resources in [Kuberentes](http://kubernetes.io/).
-If you are already familiar with Kapacitor and Kuberentes you may just want to jump over to the [K8sAutoscale](https://docs.influxdata.com/kapacitor/v1.1/nodes/k8s_autoscale_node/) docs.
+This repository provides a simple example of how you can use [Kapacitor](https://www.influxdata.com/time-series-platform/kapacitor/) to autoscale resources in [Kubernetes](http://kubernetes.io/).
+If you are already familiar with Kapacitor and Kubernetes you may just want to jump over to the [K8sAutoscale](https://docs.influxdata.com/kapacitor/v1.1/nodes/k8s_autoscale_node/) docs.
 
 ## Getting setup
 
@@ -141,7 +141,7 @@ There will be lots of output about the content and status of the task but the se
 
     k8s_autoscale6 [avg_exec_time_ns="0s" cooldown_drops="0" decrease_events="0" errors="0" increase_events="0" ];
 
-Since the task has just start the k8s_autoscale6 node has not processed any points yet but it will after a minute.
+Since the task has just started the k8s_autoscale6 node has not processed any points yet but it will after a minute.
 
 At this point take a minute to read the task and get a feel for what it is doing.
 The high level steps are:
@@ -185,7 +185,7 @@ That should be the number of app pods running.
 You may have noticed that new nodes are not immediately added once a new threshold is crossed.
 This is because we have instructed Kapacitor to only increase the number of replicas at most once per minute.
 This is so that we give the new nodes that have been added a chance to warm up and for the cluster as a whole to stabilize.
-Typically you would set this value to how ever long is takes a new pods to get up and running.
+Typically you would set this value to however long is takes a new pods to get up and running.
 In our simple example the app can start up much faster because it does so little.
 Feel free to play with the cooldown settings to see how it reacts.
 
@@ -196,7 +196,7 @@ For more information and details on this process have a look at the [docs](https
 
 ## Why not just use an HPA?
 
-Kuberentes already comes with a horizontal pod autoscaler (HPA), why use Kapacitor?
+Kubernetes already comes with a [horizontal pod autoscaler](http://kubernetes.io/docs/user-guide/horizontal-pod-autoscaling/) (HPA), why use Kapacitor?
 First, off the HPA was the basis for how the autoscaler was implemented in Kapacitor.
 Currently the HPA can only scale based off memory/cpu usage metrics or using custom metrics which must be defined via cAdvisor specific definitions.
 

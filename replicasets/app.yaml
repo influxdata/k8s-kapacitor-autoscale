@@ -10,7 +10,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: kapacitor-autoscale/app:0.0.1
+        image: quay.io/influxdb/k8s-kapacitor-autoscale:0.0.1
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8000
